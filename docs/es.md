@@ -1,0 +1,162 @@
+# Dooya Connector
+
+Esta integración controla, desde Gladys, los motores emparejados con una pasarela
+**Dooya Connector**: estores enrollables, persianas, estores venecianos, toldos,
+puertas y cortinas. La misma pasarela se vende con otras marcas (Brel, Bloc Blinds,
+Coulisse Motion, Smart Blinds…): si sus motores están emparejados en la app
+**Connector**, esta integración habla con ellos.
+
+Todo ocurre **en su red local**: Gladys habla con la pasarela en el puerto UDP 32100.
+No se usa ninguna cuenta en la nube y nada sale de su casa.
+
+## Antes de empezar
+
+1. La pasarela está configurada en la app **Connector** y sus motores están
+   emparejados con ella. Dé a cada motor su tipo en la app (estor enrollable, cortina,
+   estor veneciano…): Gladys lo usa para elegir la tarjeta adecuada.
+2. La pasarela tiene una **dirección IP fija**: resérvela en su router (reserva DHCP).
+   La integración la alcanza en esa dirección; si cambia, Gladys pierde la pasarela.
+3. Gladys y la pasarela están en la **misma red**.
+
+### Obtener la clave
+
+La pasarela solo acepta órdenes que llevan su **clave**, de 16 caracteres:
+
+1. Abra la app **Connector**.
+2. Vaya a **Ajustes** (o **Yo**) y luego **Acerca de**.
+3. Toque la pantalla **cinco veces** rápidamente: aparece la clave, por ejemplo
+   `12ab345c-d67e-8f`.
+
+Cópiela **exactamente**, guiones incluidos: forman parte de los 16 caracteres.
+
+### Obtener la dirección IP
+
+- en la app Connector, los detalles de la pasarela suelen mostrar su dirección IP;
+- si no, en la lista de dispositivos conectados a su router;
+- o pulse **Buscar la pasarela** en la configuración de la integración (ver más
+  abajo).
+
+## Configuración
+
+| Campo                          | Qué introducir                                                                               |
+| ------------------------------ | -------------------------------------------------------------------------------------------- |
+| Dirección IP de la pasarela    | La dirección IPv4 de la pasarela, p. ej. `192.168.1.50`.                                     |
+| Clave de la app Connector      | La clave de 16 caracteres (ver arriba). Nunca se escribe en los registros.                   |
+| Intervalo de actualización (s) | Frecuencia de lectura del estado de cada motor, de 30 a 3600 segundos (60 por defecto).      |
+| Umbral de batería baja (%)     | Por debajo de este nivel se activa el disparador de escena `battery_low` (20 % por defecto). |
+
+Guarde y pulse **Probar la conexión**: la respuesta da la dirección de la pasarela, el
+número de motores, el firmware y la señal Wi-Fi, y confirma que la clave es aceptada.
+
+## Añadir los motores
+
+Abra la pestaña **Descubrimiento** de la integración: aparece cada motor de la
+pasarela. Añada los que quiera y cámbieles el nombre (la pasarela no tiene nombres: un
+motor aparece primero como «Roller blind 0001», con las últimas cifras de su
+dirección).
+
+### Lo que muestra cada motor
+
+| Función  | Cuándo                          | Valores                         |
+| -------- | ------------------------------- | ------------------------------- |
+| Estado   | siempre                         | abrir / parar / cerrar          |
+| Posición | el motor informa de su posición | 0 % (cerrado) a 100 % (abierto) |
+| Batería  | motor de batería                | 0 a 100 %                       |
+
+Un estor **top down bottom up** tiene dos rieles, así que dos estados y dos posiciones:
+«top» (arriba) y «bottom» (abajo).
+
+Un motor de radio unidireccional solo recibe órdenes: no tiene posición, y Gladys
+muestra la última orden enviada.
+
+### Cómo se mantiene el estado al día
+
+La pasarela guarda en memoria el último estado de cada motor. Gladys lo lee en el
+**intervalo de actualización**: no cuesta tráfico de radio ni batería. Tras una orden de
+Gladys, el motor se sigue **cada 2 segundos** hasta que se detiene: la posición sigue
+el movimiento.
+
+Un motor movido con su mando, la app o un interruptor de pared se ve en la siguiente
+lectura.
+
+La insignia de cada motor indica **local** mientras la pasarela responde, si no
+**inaccesible**.
+
+## Acciones
+
+En la configuración de la integración:
+
+- **Probar la conexión**: comprueba la dirección y la clave, y resume lo que dice la
+  pasarela.
+- **Buscar la pasarela**: Gladys difunde una petición de descubrimiento en su red y
+  lista las pasarelas que responden, con su dirección IP. Algunas pasarelas solo
+  responden a su propio grupo multicast y se quedan calladas: consulte entonces la
+  dirección en su router.
+- **Identificar un motor**: el motor elegido sube un pequeño paso y luego vuelve.
+  Práctico para saber qué estor es cuál.
+
+## Escenas (Gladys 5.1+)
+
+### Disparadores de escena
+
+| Disparador                              | Clave                    | Filtros                | Variables                              |
+| --------------------------------------- | ------------------------ | ---------------------- | -------------------------------------- |
+| Un estor se ha movido sin Gladys        | `moved_outside_gladys`   | motor, sentido         | `device_name`, `direction`, `position` |
+| La batería de un motor está baja        | `battery_low`            | motor                  | `device_name`, `battery`               |
+| La conexión con la pasarela ha cambiado | `hub_connection_changed` | perdida / restablecida | `status`                               |
+
+- `moved_outside_gladys` se activa cuando un motor se detiene en una nueva posición
+  tras moverlo un mando, la app Connector o un interruptor de pared. Un movimiento
+  ordenado por Gladys nunca lo activa (durante 2 minutos tras la orden): una escena no
+  puede entrar en bucle.
+- `battery_low` se activa una vez cuando la batería baja del umbral, y de nuevo solo
+  después de recargarla.
+- `hub_connection_changed` se activa cuando la pasarela deja de responder (`lost`) y
+  cuando vuelve a responder (`restored`).
+
+Use las variables en las acciones siguientes, p. ej.
+`{{triggerEvent.data.device_name}}`.
+
+### Acciones de escena
+
+| Acción                    | Clave               | Parámetros                |
+| ------------------------- | ------------------- | ------------------------- |
+| Ir a la posición favorita | `favorite_position` | motor                     |
+| Mover un paso             | `jog`               | motor, arriba o abajo     |
+| Orientar las lamas        | `set_tilt`          | motor, ángulo de 0 a 180° |
+| Mover todos los estores   | `move_all`          | abrir, cerrar o parar     |
+
+`move_all` da dos resultados a las acciones siguientes: `sent` (motores alcanzados) y
+`failed` (motores sin respuesta).
+
+Para abrir, cerrar o posicionar un solo motor, use la acción estándar de Gladys
+«Controlar dispositivos» sobre su estado o su posición.
+
+## Widget «Dooya Connector»
+
+Añádalo a un panel: muestra la posición de los cuatro primeros motores (en directo),
+el estado de la pasarela (conectada o no, número de motores, señal Wi-Fi, firmware),
+los motores con batería baja y tres botones: **Abrir todo**, **Cerrar todo** (pide
+confirmación) y **Parar todo**.
+
+## Bueno saber
+
+- La pasarela cuenta las posiciones desde arriba (0 = abierto); Gladys desde abajo
+  (100 = abierto). La integración hace la conversión: solo ve el sentido de Gladys.
+- La posición favorita es la guardada en el motor (con su mando o la app).
+- La integración lee la memoria de la pasarela: un motor que ha perdido su enlace de
+  radio con ella conserva su último estado conocido.
+
+## Solución de problemas
+
+| Síntoma                                         | Qué comprobar                                                                                                            |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| «Sin respuesta de … en el puerto UDP 32100»     | La dirección IP, que la pasarela está encendida, en la misma red que Gladys, y que ningún cortafuegos bloquea UDP 32100. |
+| «La clave debe tener exactamente 16 caracteres» | Copie de nuevo la clave, guiones incluidos, sin espacios.                                                                |
+| «La pasarela responde pero rechaza la clave»    | La clave es de otra pasarela o se escribió mal: cópiela de nuevo desde la app.                                           |
+| Ningún motor en la pestaña Descubrimiento       | Los motores deben emparejarse primero en la app Connector.                                                               |
+| La posición no cambia                           | Los motores unidireccionales no la informan; para los demás, compruebe el motor en la app Connector.                     |
+| «Buscar la pasarela» no encuentra nada          | Normal en algunas pasarelas: introduzca la dirección que vea en su router.                                               |
+
+Los registros de la integración, en Gladys, indican cuándo la pasarela deja de
+responder y por qué ha fallado una orden. La clave y los tokens nunca se escriben ahí.

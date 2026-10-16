@@ -1,0 +1,623 @@
+{
+  "manifest_version": 1,
+  "type": "device",
+  "name": "Dooya Connector",
+  "description": {
+    "en": "Control the blinds, shutters and curtains of a Dooya Connector hub, locally.",
+    "fr": "Pilotez stores, volets et rideaux d'une passerelle Dooya Connector, en local.",
+    "de": "Steuere Rollos, Rollläden und Vorhänge eines Dooya-Connector-Gateways, lokal.",
+    "es": "Controle estores, persianas y cortinas de una pasarela Dooya Connector, en local."
+  },
+  "version": "0.1.0",
+  "docker_image": "ghcr.io/prohand/gladys-dooyaconnector:0.1.0",
+  "gladys_version": ">=5.1.0",
+  "cover_image": "https://raw.githubusercontent.com/prohand/gladys-dooyaconnector/main/cover.png",
+  "categories": ["appliances", "climate"],
+  "transports": ["local"],
+  "network_discovery": [
+    {
+      "type": "udp-active-broadcast",
+      "ports": [32100]
+    }
+  ],
+  "config_schema": [
+    {
+      "key": "intro",
+      "type": "section",
+      "label": {
+        "en": "Getting started",
+        "fr": "Pour commencer",
+        "de": "Erste Schritte",
+        "es": "Primeros pasos"
+      },
+      "description": {
+        "en": "The integration talks to the Connector hub on your network (UDP port 32100): no cloud account is used. It needs two things: the IP address of the hub, and the 16-character key shown by the Connector app (Settings, About, tap the screen five times). Motors paired in the app then show up in the Discovery tab.",
+        "fr": "L'intégration dialogue avec la passerelle Connector sur votre réseau (port UDP 32100) : aucun compte cloud n'est utilisé. Il lui faut deux choses : l'adresse IP de la passerelle et la clé de 16 caractères affichée par l'application Connector (Paramètres, À propos, touchez l'écran cinq fois). Les moteurs appairés dans l'application apparaissent ensuite dans l'onglet Découverte.",
+        "de": "Die Integration spricht mit dem Connector-Gateway in deinem Netzwerk (UDP-Port 32100): Es wird kein Cloud-Konto verwendet. Sie braucht zwei Dinge: die IP-Adresse des Gateways und den 16-stelligen Schlüssel, den die Connector-App anzeigt (Einstellungen, Über, fünfmal auf den Bildschirm tippen). Die in der App gekoppelten Motoren erscheinen dann im Reiter Erkennung.",
+        "es": "La integración habla con la pasarela Connector en su red (puerto UDP 32100): no se usa ninguna cuenta en la nube. Necesita dos cosas: la dirección IP de la pasarela y la clave de 16 caracteres que muestra la app Connector (Ajustes, Acerca de, toque la pantalla cinco veces). Los motores emparejados en la app aparecen después en la pestaña Descubrimiento."
+      },
+      "links": [
+        {
+          "url": "https://github.com/prohand/gladys-dooyaconnector/blob/main/docs/en.md",
+          "label": {
+            "en": "Integration documentation",
+            "fr": "Documentation de l'intégration",
+            "de": "Dokumentation der Integration",
+            "es": "Documentación de la integración"
+          }
+        }
+      ]
+    },
+    {
+      "key": "gateway_ip",
+      "type": "string",
+      "label": {
+        "en": "Hub IP address",
+        "fr": "Adresse IP de la passerelle",
+        "de": "IP-Adresse des Gateways",
+        "es": "Dirección IP de la pasarela"
+      },
+      "description": {
+        "en": "The IPv4 address of the Connector hub on your network. Give it a fixed address in your router. Not known? Try the \"Find the hub\" button.",
+        "fr": "L'adresse IPv4 de la passerelle Connector sur votre réseau. Fixez-la dans votre box. Vous ne la connaissez pas ? Essayez le bouton « Chercher la passerelle ».",
+        "de": "Die IPv4-Adresse des Connector-Gateways in deinem Netzwerk. Gib ihm im Router eine feste Adresse. Unbekannt? Probiere die Schaltfläche „Gateway suchen“.",
+        "es": "La dirección IPv4 de la pasarela Connector en su red. Fíjela en su router. ¿No la conoce? Pruebe el botón «Buscar la pasarela»."
+      },
+      "placeholder": {
+        "en": "192.168.1.50",
+        "fr": "192.168.1.50",
+        "de": "192.168.1.50",
+        "es": "192.168.1.50"
+      },
+      "required": true
+    },
+    {
+      "key": "key",
+      "type": "secret",
+      "label": {
+        "en": "Connector app key",
+        "fr": "Clé de l'application Connector",
+        "de": "Schlüssel der Connector-App",
+        "es": "Clave de la app Connector"
+      },
+      "description": {
+        "en": "16 characters, dashes included. In the Connector app: Settings, About, tap the screen five times. It is never written to the logs.",
+        "fr": "16 caractères, tirets compris. Dans l'application Connector : Paramètres, À propos, touchez l'écran cinq fois. Elle n'est jamais écrite dans les journaux.",
+        "de": "16 Zeichen, Bindestriche inklusive. In der Connector-App: Einstellungen, Über, fünfmal auf den Bildschirm tippen. Er wird nie in die Protokolle geschrieben.",
+        "es": "16 caracteres, guiones incluidos. En la app Connector: Ajustes, Acerca de, toque la pantalla cinco veces. Nunca se escribe en los registros."
+      },
+      "placeholder": {
+        "en": "12ab345c-d67e-8f",
+        "fr": "12ab345c-d67e-8f",
+        "de": "12ab345c-d67e-8f",
+        "es": "12ab345c-d67e-8f"
+      },
+      "required": true
+    },
+    {
+      "key": "poll_frequency",
+      "type": "number",
+      "label": {
+        "en": "Refresh interval (s)",
+        "fr": "Intervalle de rafraîchissement (s)",
+        "de": "Aktualisierungsintervall (s)",
+        "es": "Intervalo de actualización (s)"
+      },
+      "description": {
+        "en": "How often the state of each motor is read from the hub, in seconds. The hub answers from memory: no radio traffic, no battery used. After an order, the motor is followed every 2 seconds until it stops.",
+        "fr": "Fréquence de lecture de l'état de chaque moteur, en secondes. La passerelle répond de mémoire : pas de trafic radio, pas de batterie consommée. Après un ordre, le moteur est suivi toutes les 2 secondes jusqu'à son arrêt.",
+        "de": "Wie oft der Zustand jedes Motors beim Gateway gelesen wird, in Sekunden. Das Gateway antwortet aus dem Speicher: kein Funkverkehr, kein Akkuverbrauch. Nach einem Befehl wird der Motor alle 2 Sekunden verfolgt, bis er anhält.",
+        "es": "Frecuencia de lectura del estado de cada motor, en segundos. La pasarela responde de memoria: sin tráfico de radio, sin gasto de batería. Tras una orden, el motor se sigue cada 2 segundos hasta que se detiene."
+      },
+      "required": false,
+      "default": 60,
+      "min": 30,
+      "max": 3600
+    },
+    {
+      "key": "battery_low_threshold",
+      "type": "number",
+      "label": {
+        "en": "Low battery threshold (%)",
+        "fr": "Seuil de batterie faible (%)",
+        "de": "Schwelle für schwachen Akku (%)",
+        "es": "Umbral de batería baja (%)"
+      },
+      "description": {
+        "en": "Under this level, the \"Battery low\" scene trigger fires, once per motor.",
+        "fr": "Sous ce niveau, le déclencheur de scène « Batterie faible » se déclenche, une fois par moteur.",
+        "de": "Unter diesem Wert löst der Szenenauslöser „Akku schwach“ aus, einmal pro Motor.",
+        "es": "Por debajo de este nivel se activa el disparador de escena «Batería baja», una vez por motor."
+      },
+      "required": false,
+      "default": 20,
+      "min": 5,
+      "max": 50
+    }
+  ],
+  "actions": [
+    {
+      "key": "test_connection",
+      "label": {
+        "en": "Test the connection",
+        "fr": "Tester la connexion",
+        "de": "Verbindung testen",
+        "es": "Probar la conexión"
+      },
+      "timeout_seconds": 30
+    },
+    {
+      "key": "find_gateway",
+      "label": {
+        "en": "Find the hub",
+        "fr": "Chercher la passerelle",
+        "de": "Gateway suchen",
+        "es": "Buscar la pasarela"
+      },
+      "timeout_seconds": 30
+    },
+    {
+      "key": "identify",
+      "label": {
+        "en": "Identify a motor",
+        "fr": "Identifier un moteur",
+        "de": "Motor identifizieren",
+        "es": "Identificar un motor"
+      },
+      "timeout_seconds": 30,
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Motor",
+            "fr": "Moteur",
+            "de": "Motor",
+            "es": "Motor"
+          },
+          "required": true
+        }
+      ]
+    }
+  ],
+  "scene_triggers": [
+    {
+      "key": "moved_outside_gladys",
+      "label": {
+        "en": "A blind moved without Gladys",
+        "fr": "Un store a bougé sans Gladys",
+        "de": "Ein Rollo hat sich ohne Gladys bewegt",
+        "es": "Un estor se ha movido sin Gladys"
+      },
+      "description": {
+        "en": "A motor came to rest at a new position after a remote, the Connector app or a wall switch moved it.",
+        "fr": "Un moteur s'est arrêté à une nouvelle position après une télécommande, l'application Connector ou un interrupteur.",
+        "de": "Ein Motor ist an einer neuen Position stehen geblieben, nachdem eine Fernbedienung, die Connector-App oder ein Wandschalter ihn bewegt hat.",
+        "es": "Un motor se ha detenido en una nueva posición tras moverlo un mando, la app Connector o un interruptor de pared."
+      },
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Motor",
+            "fr": "Moteur",
+            "de": "Motor",
+            "es": "Motor"
+          },
+          "required": false
+        },
+        {
+          "key": "direction",
+          "type": "multi_select",
+          "label": {
+            "en": "Direction",
+            "fr": "Sens",
+            "de": "Richtung",
+            "es": "Sentido"
+          },
+          "options": [
+            {
+              "value": "up",
+              "label": {
+                "en": "Up / open",
+                "fr": "Vers le haut / ouvert",
+                "de": "Hoch / offen",
+                "es": "Arriba / abierto"
+              }
+            },
+            {
+              "value": "down",
+              "label": {
+                "en": "Down / closed",
+                "fr": "Vers le bas / fermé",
+                "de": "Runter / geschlossen",
+                "es": "Abajo / cerrado"
+              }
+            }
+          ]
+        }
+      ],
+      "variables": [
+        {
+          "key": "device_name",
+          "type": "string",
+          "label": {
+            "en": "Motor name",
+            "fr": "Nom du moteur",
+            "de": "Name des Motors",
+            "es": "Nombre del motor"
+          }
+        },
+        {
+          "key": "direction",
+          "type": "string",
+          "label": {
+            "en": "Direction",
+            "fr": "Sens",
+            "de": "Richtung",
+            "es": "Sentido"
+          }
+        },
+        {
+          "key": "position",
+          "type": "number",
+          "label": {
+            "en": "New position (%)",
+            "fr": "Nouvelle position (%)",
+            "de": "Neue Position (%)",
+            "es": "Nueva posición (%)"
+          }
+        }
+      ]
+    },
+    {
+      "key": "battery_low",
+      "label": {
+        "en": "A motor battery is low",
+        "fr": "La batterie d'un moteur est faible",
+        "de": "Der Akku eines Motors ist schwach",
+        "es": "La batería de un motor está baja"
+      },
+      "description": {
+        "en": "A battery motor fell under the threshold set in the configuration. Fired once, until it is charged again.",
+        "fr": "Un moteur sur batterie est passé sous le seuil de la configuration. Une seule fois, jusqu'à la recharge.",
+        "de": "Ein Akkumotor ist unter die in der Konfiguration gesetzte Schwelle gefallen. Einmal, bis er wieder geladen ist.",
+        "es": "Un motor de batería ha bajado del umbral de la configuración. Una sola vez, hasta que se recargue."
+      },
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Motor",
+            "fr": "Moteur",
+            "de": "Motor",
+            "es": "Motor"
+          },
+          "required": false
+        }
+      ],
+      "variables": [
+        {
+          "key": "device_name",
+          "type": "string",
+          "label": {
+            "en": "Motor name",
+            "fr": "Nom du moteur",
+            "de": "Name des Motors",
+            "es": "Nombre del motor"
+          }
+        },
+        {
+          "key": "battery",
+          "type": "number",
+          "label": {
+            "en": "Battery (%)",
+            "fr": "Batterie (%)",
+            "de": "Akku (%)",
+            "es": "Batería (%)"
+          }
+        }
+      ]
+    },
+    {
+      "key": "hub_connection_changed",
+      "label": {
+        "en": "The hub connection changed",
+        "fr": "La connexion à la passerelle a changé",
+        "de": "Die Verbindung zum Gateway hat sich geändert",
+        "es": "La conexión con la pasarela ha cambiado"
+      },
+      "description": {
+        "en": "The Connector hub stopped answering, or answers again.",
+        "fr": "La passerelle Connector ne répond plus, ou répond de nouveau.",
+        "de": "Das Connector-Gateway antwortet nicht mehr oder wieder.",
+        "es": "La pasarela Connector ha dejado de responder, o vuelve a responder."
+      },
+      "fields": [
+        {
+          "key": "status",
+          "type": "multi_select",
+          "label": {
+            "en": "Status",
+            "fr": "État",
+            "de": "Status",
+            "es": "Estado"
+          },
+          "options": [
+            {
+              "value": "lost",
+              "label": {
+                "en": "Connection lost",
+                "fr": "Connexion perdue",
+                "de": "Verbindung verloren",
+                "es": "Conexión perdida"
+              }
+            },
+            {
+              "value": "restored",
+              "label": {
+                "en": "Connection restored",
+                "fr": "Connexion rétablie",
+                "de": "Verbindung wiederhergestellt",
+                "es": "Conexión restablecida"
+              }
+            }
+          ]
+        }
+      ],
+      "variables": [
+        {
+          "key": "status",
+          "type": "string",
+          "label": {
+            "en": "Status",
+            "fr": "État",
+            "de": "Status",
+            "es": "Estado"
+          }
+        }
+      ]
+    }
+  ],
+  "scene_actions": [
+    {
+      "key": "favorite_position",
+      "label": {
+        "en": "Go to the favourite position",
+        "fr": "Aller à la position favorite",
+        "de": "Lieblingsposition anfahren",
+        "es": "Ir a la posición favorita"
+      },
+      "description": {
+        "en": "Send a motor to the favourite position saved in it.",
+        "fr": "Envoie un moteur à la position favorite enregistrée dans celui-ci.",
+        "de": "Schickt einen Motor an die in ihm gespeicherte Lieblingsposition.",
+        "es": "Envía un motor a la posición favorita guardada en él."
+      },
+      "timeout_seconds": 30,
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Motor",
+            "fr": "Moteur",
+            "de": "Motor",
+            "es": "Motor"
+          },
+          "required": true
+        }
+      ]
+    },
+    {
+      "key": "jog",
+      "label": {
+        "en": "Move one step",
+        "fr": "Avancer d'un pas",
+        "de": "Einen Schritt fahren",
+        "es": "Mover un paso"
+      },
+      "description": {
+        "en": "Move a motor one small step up or down, e.g. to turn slats a little.",
+        "fr": "Déplace un moteur d'un petit pas vers le haut ou le bas, pour orienter un peu des lames par exemple.",
+        "de": "Bewegt einen Motor einen kleinen Schritt hoch oder runter, z. B. um Lamellen leicht zu drehen.",
+        "es": "Mueve un motor un pequeño paso arriba o abajo, p. ej. para girar un poco las lamas."
+      },
+      "timeout_seconds": 30,
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Motor",
+            "fr": "Moteur",
+            "de": "Motor",
+            "es": "Motor"
+          },
+          "required": true
+        },
+        {
+          "key": "direction",
+          "type": "select",
+          "label": {
+            "en": "Direction",
+            "fr": "Sens",
+            "de": "Richtung",
+            "es": "Sentido"
+          },
+          "required": true,
+          "default": "up",
+          "options": [
+            {
+              "value": "up",
+              "label": {
+                "en": "Up",
+                "fr": "Haut",
+                "de": "Hoch",
+                "es": "Arriba"
+              }
+            },
+            {
+              "value": "down",
+              "label": {
+                "en": "Down",
+                "fr": "Bas",
+                "de": "Runter",
+                "es": "Abajo"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "set_tilt",
+      "label": {
+        "en": "Tilt the slats",
+        "fr": "Orienter les lames",
+        "de": "Lamellen neigen",
+        "es": "Orientar las lamas"
+      },
+      "description": {
+        "en": "Turn the slats of a venetian or Shangri-La blind, from 0 to 180 degrees.",
+        "fr": "Oriente les lames d'un store vénitien ou Shangri-La, de 0 à 180 degrés.",
+        "de": "Dreht die Lamellen einer Jalousie oder eines Shangri-La-Rollos, von 0 bis 180 Grad.",
+        "es": "Gira las lamas de un estor veneciano o Shangri-La, de 0 a 180 grados."
+      },
+      "timeout_seconds": 30,
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Motor",
+            "fr": "Moteur",
+            "de": "Motor",
+            "es": "Motor"
+          },
+          "required": true
+        },
+        {
+          "key": "angle",
+          "type": "number",
+          "label": {
+            "en": "Angle (°)",
+            "fr": "Angle (°)",
+            "de": "Winkel (°)",
+            "es": "Ángulo (°)"
+          },
+          "required": true,
+          "min": 0,
+          "max": 180
+        }
+      ]
+    },
+    {
+      "key": "move_all",
+      "label": {
+        "en": "Move every blind",
+        "fr": "Bouger tous les stores",
+        "de": "Alle Rollos bewegen",
+        "es": "Mover todos los estores"
+      },
+      "description": {
+        "en": "Open, close or stop every motor of the hub at once.",
+        "fr": "Ouvre, ferme ou arrête tous les moteurs de la passerelle d'un coup.",
+        "de": "Öffnet, schließt oder stoppt alle Motoren des Gateways auf einmal.",
+        "es": "Abre, cierra o detiene todos los motores de la pasarela a la vez."
+      },
+      "timeout_seconds": 120,
+      "fields": [
+        {
+          "key": "order",
+          "type": "select",
+          "label": {
+            "en": "Order",
+            "fr": "Ordre",
+            "de": "Befehl",
+            "es": "Orden"
+          },
+          "required": true,
+          "options": [
+            {
+              "value": "open",
+              "label": {
+                "en": "Open",
+                "fr": "Ouvrir",
+                "de": "Öffnen",
+                "es": "Abrir"
+              }
+            },
+            {
+              "value": "close",
+              "label": {
+                "en": "Close",
+                "fr": "Fermer",
+                "de": "Schließen",
+                "es": "Cerrar"
+              }
+            },
+            {
+              "value": "stop",
+              "label": {
+                "en": "Stop",
+                "fr": "Arrêter",
+                "de": "Stoppen",
+                "es": "Parar"
+              }
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "key": "sent",
+          "type": "number",
+          "label": {
+            "en": "Motors reached",
+            "fr": "Moteurs atteints",
+            "de": "Erreichte Motoren",
+            "es": "Motores alcanzados"
+          }
+        },
+        {
+          "key": "failed",
+          "type": "number",
+          "label": {
+            "en": "Motors without answer",
+            "fr": "Moteurs sans réponse",
+            "de": "Motoren ohne Antwort",
+            "es": "Motores sin respuesta"
+          }
+        }
+      ]
+    }
+  ],
+  "widgets": [
+    {
+      "key": "connector",
+      "label": {
+        "en": "Dooya Connector",
+        "fr": "Dooya Connector",
+        "de": "Dooya Connector",
+        "es": "Dooya Connector"
+      },
+      "description": {
+        "en": "Blind positions, hub status, low batteries, and open / close / stop all.",
+        "fr": "Positions des stores, état de la passerelle, batteries faibles, tout ouvrir / fermer.",
+        "de": "Rollopositionen, Gateway-Status, schwache Akkus, alle öffnen / schließen.",
+        "es": "Posiciones de los estores, estado de la pasarela, baterías bajas, abrir / cerrar todo."
+      },
+      "icon": "layers",
+      "action_timeout_seconds": 120
+    }
+  ]
+}
