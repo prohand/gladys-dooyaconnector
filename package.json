@@ -1,6 +1,6 @@
 {
   "name": "gladys-dooyaconnector",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Gladys Assistant external integration for the Dooya Connector hub (blinds, shutters and curtains).",
   "type": "module",
