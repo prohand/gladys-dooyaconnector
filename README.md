@@ -24,6 +24,8 @@ User documentation: [English](docs/en.md) · [Français](docs/fr.md) ·
 | Dashboard widget (5.1+) | `connector`: live positions, hub status, low batteries, open / close / stop all.                   |
 | Languages               | English, French, German and Spanish, everywhere.                                                   |
 
+Requires **Gladys 5.3.0** or later (manifest `keywords`, SDK 0.16).
+
 **Local only** (manifest `"transports": ["local"]`): the hub has a documented LAN
 protocol, so no cloud account is involved and nothing leaves the home network.
 

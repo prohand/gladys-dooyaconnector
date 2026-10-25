@@ -16,6 +16,7 @@ Everything happens **on your local network**: Gladys talks to the hub on UDP por
 2. The hub has a **fixed IP address**: reserve it in your router (DHCP reservation).
    The integration reaches it at that address; if it changes, Gladys loses the hub.
 3. Gladys and the hub are on the **same network**.
+4. Gladys **5.3.0** or later.
 
 ### Getting the key
 

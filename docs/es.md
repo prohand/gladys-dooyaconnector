@@ -17,6 +17,7 @@ No se usa ninguna cuenta en la nube y nada sale de su casa.
 2. La pasarela tiene una **dirección IP fija**: resérvela en su router (reserva DHCP).
    La integración la alcanza en esa dirección; si cambia, Gladys pierde la pasarela.
 3. Gladys y la pasarela están en la **misma red**.
+4. Gladys **5.3.0** o posterior.
 
 ### Obtener la clave
 

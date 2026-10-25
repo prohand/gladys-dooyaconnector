@@ -129,6 +129,10 @@ const CATEGORIES = [
   'notifications',
   'assistants',
   'services',
+  'transport',
+  'vehicles',
+  'servers',
+  'leisure',
 ];
 
 test('the categories stay inside the vocabulary the store indexes', () => {
@@ -139,9 +143,36 @@ test('the categories stay inside the vocabulary the store indexes', () => {
   }
 });
 
-test('the Gladys floor covers the widgets and scene declarations (5.1)', () => {
-  const [major, minor] = manifest.gladys_version.replace(/^>=/, '').split('.').map(Number);
-  assert.ok(major > 5 || (major === 5 && minor >= 1), `got ${manifest.gladys_version}`);
+/** The minimum version of a `>=x.y.z` range, as [major, minor, patch] numbers. */
+const floorOf = (range) => range.replace(/^>=/, '').split('.').map(Number);
+const floorAtLeast = (range, [major, minor]) => {
+  const [rangeMajor, rangeMinor] = floorOf(range);
+  return rangeMajor > major || (rangeMajor === major && rangeMinor >= minor);
+};
+
+test('the Gladys floor covers every manifest field declared (5.3 for keywords)', () => {
+  assert.match(manifest.gladys_version, /^>=\d+\.\d+\.\d+$/);
+  assert.ok(floorAtLeast(manifest.gladys_version, [5, 1]), 'widgets and scenes need 5.1');
+  if (manifest.keywords || manifest.countries || manifest.music) {
+    assert.ok(floorAtLeast(manifest.gladys_version, [5, 3]), `got ${manifest.gladys_version}`);
+  }
+  assert.equal(manifest.gladys_version, '>=5.3.0');
+});
+
+test('the search keywords follow the store rules', () => {
+  const { keywords } = manifest;
+  assert.ok(Array.isArray(keywords) && keywords.length >= 1 && keywords.length <= 10);
+  const normalized = keywords.map((keyword) => keyword.trim().toLowerCase());
+  assert.equal(new Set(normalized).size, keywords.length, 'keywords must be unique');
+  for (const keyword of keywords) {
+    assert.equal(typeof keyword, 'string');
+    const { length } = keyword.trim();
+    assert.ok(length >= 2 && length <= 30, `keyword "${keyword}": ${length} characters`);
+  }
+});
+
+test('the hub is sold worldwide: no country restriction', () => {
+  assert.equal(manifest.countries, undefined);
 });
 
 test('local only, and the discovery broadcast goes to the hub port', () => {
