@@ -102,7 +102,8 @@ export function buildDevice(gladys, motor) {
   const category = isCurtain(motor.deviceType, info.type)
     ? DEVICE_FEATURE_CATEGORIES.CURTAIN
     : DEVICE_FEATURE_CATEGORIES.SHUTTER;
-  const types = DEVICE_FEATURE_TYPES[category === 'curtain' ? 'CURTAIN' : 'SHUTTER'];
+  const types =
+    DEVICE_FEATURE_TYPES[category === DEVICE_FEATURE_CATEGORIES.CURTAIN ? 'CURTAIN' : 'SHUTTER'];
   // A motor that never answered is assumed to report its position: the
   // feature is then there for when it does.
   const withPosition = info.wirelessMode === undefined || reportsPosition(info.wirelessMode);

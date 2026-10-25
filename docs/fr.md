@@ -18,6 +18,7 @@ port UDP 32100. Aucun compte cloud n'est utilisé et rien ne sort de chez vous.
    statique). L'intégration la joint à cette adresse ; si elle change, Gladys perd la
    passerelle.
 3. Gladys et la passerelle sont sur le **même réseau**.
+4. Gladys **5.3.0** ou plus récent.
 
 ### Récupérer la clé
 

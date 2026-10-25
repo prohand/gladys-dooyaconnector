@@ -9,8 +9,8 @@ A Gladys Assistant **external integration** (Node 22+, ESM, no build step, one r
 dependency: `@gladysassistant/integration-sdk`) for the **Dooya Connector** hub
 (DD7002B and alike, also sold as Brel, Bloc Blinds, Coulisse Motion…) and the blind,
 shutter and curtain motors it drives. It started from the official JavaScript template
-(GladysAssistant/integration-template-js). Gladys 5.1+ adds scene triggers, scene
-actions and a "Dooya Connector" widget.
+(GladysAssistant/integration-template-js). It requires Gladys 5.3.0+ (manifest
+`keywords`); scene triggers, scene actions and a "Dooya Connector" widget came with 5.1.
 
 **Local only**: the hub is reached in unicast UDP on port 32100 (manifest
 `transports: ["local"]`). No cloud account, no cloud API.
@@ -68,7 +68,8 @@ test/                        node --test, fake Gladys of the SDK + fake UDP hub
 - **Polling**: devices are published with `should_poll: true` and
   `poll_frequency: EVERY_30_SECONDS` (Gladys refuses any value outside
   `DEVICE_POLL_FREQUENCIES`, in ms). The configured `poll_frequency` is in seconds and
-  applied by skipping polls (`createPoller`).
+  applied by skipping polls (`createPoller`). Since Gladys 5.3 the core sets
+  `should_poll` itself from `poll_frequency`; the flag stays for older devices.
 - **Scene events, one per transition.** `moved_outside_gladys` is never fired within
   `COMMAND_WINDOW_MS` of a Gladys order (no loop through a scene); `battery_low` has a
   hysteresis; `hub_connection_changed` skips the first answer after a start.
@@ -90,6 +91,8 @@ test/                        node --test, fake Gladys of the SDK + fake UDP hub
   a version heading: the Release workflow does.
 - **Manifest.** Every text is `{ en, fr, de, es }` (labels, descriptions, placeholders,
   options). The catalog `description` holds 10 to 100 characters per language.
+  `gladys_version` is `>=5.3.0` (`keywords`); `keywords` are 1-10 unique search terms
+  of 2-30 characters (brands the hub is sold as), no `countries` (sold worldwide).
   `test/manifest.test.js` ties the manifest to the code: change both sides together.
 - **User-facing text** is in four languages: messages built with `src/i18n.js`, and
   `docs/en.md`, `docs/fr.md`, `docs/de.md`, `docs/es.md` kept in sync.

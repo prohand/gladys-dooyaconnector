@@ -18,6 +18,7 @@ UDP-Port 32100. Es wird kein Cloud-Konto verwendet, und nichts verlässt dein Zu
    (DHCP-Reservierung). Die Integration erreicht es unter dieser Adresse; ändert sie
    sich, verliert Gladys das Gateway.
 3. Gladys und das Gateway sind im **selben Netzwerk**.
+4. Gladys **5.3.0** oder neuer.
 
 ### Den Schlüssel holen
 

@@ -10,6 +10,16 @@ the version's GitHub Release.
 
 ## [Unreleased]
 
+### Changed
+
+- Gladys 5.3.0 or later is now required.
+- `@gladysassistant/integration-sdk` 0.16.
+- Store listing: search keywords (Brel, Bloc Blinds, Coulisse Motion, Smart Blinds,
+  DD7002B, roller blind, venetian blind, awning…) so the integration is found under
+  the brands the hub is also sold as.
+- The pull request CI runs the store checks without the image check; the Release
+  workflow runs them in full once the image is published.
+
 ## [0.1.2] - 2026-10-23
 
 - Maintenance release, no functional change.
