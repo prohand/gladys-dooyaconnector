@@ -10,6 +10,8 @@ the version's GitHub Release.
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-11-16
+
 - Update `@gladysassistant/integration-sdk` to 0.16.1 (security update).
 
 ## [0.2.1] - 2026-11-16
@@ -60,7 +62,8 @@ the version's GitHub Release.
   requests), UI-driven Release workflow, GitHub Releases, Dependabot.
 - `SECURITY.md` and `CLAUDE.md`.
 
-[Unreleased]: https://github.com/prohand/gladys-dooyaconnector/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/prohand/gladys-dooyaconnector/compare/v0.2.2...HEAD
+[0.2.2]: https://github.com/prohand/gladys-dooyaconnector/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/prohand/gladys-dooyaconnector/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/prohand/gladys-dooyaconnector/compare/v0.1.2...v0.2.0
 [0.1.2]: https://github.com/prohand/gladys-dooyaconnector/compare/v0.1.1...v0.1.2
