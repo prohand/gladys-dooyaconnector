@@ -10,6 +10,8 @@ the version's GitHub Release.
 
 ## [Unreleased]
 
+- Update `@gladysassistant/integration-sdk` to 0.16.1 (security update).
+
 ## [0.2.1] - 2026-11-16
 
 - Maintenance release, no functional change.
